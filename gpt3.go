@@ -25,6 +25,7 @@ const (
 	CurieEngine          = "curie"
 	DavinciEngine        = "davinci"
 	DefaultEngine        = DavinciEngine
+	OobaEngine           = "v1"
 )
 
 type EmbeddingEngine string
@@ -58,13 +59,22 @@ const (
 )
 
 const (
-	defaultBaseURL        = "https://api.openai.com/v1"
 	defaultUserAgent      = "go-gpt3"
 	defaultTimeoutSeconds = 30
 )
 
+var defaultBaseURL string = "https://api.openai.com/v1"
+
 func getEngineURL(engine string) string {
 	return fmt.Sprintf("%s/engines/%s/completions", defaultBaseURL, engine)
+}
+
+func SafeDeref[T any](p *T) T {
+	if p == nil {
+		var v T
+		return v
+	}
+	return *p
 }
 
 // A Client is an API client to communicate with the OpenAI gpt-3 APIs
@@ -126,15 +136,19 @@ type client struct {
 }
 
 // NewClient returns a new OpenAI GPT-3 API client. An apiKey is required to use the client
-func NewClient(apiKey string, options ...ClientOption) Client {
+func NewClient(apiBaseURL *string, apiKey string, options ...ClientOption) Client {
 	httpClient := &http.Client{
 		Timeout: time.Duration(defaultTimeoutSeconds * time.Second),
+	}
+
+	if apiBaseURL == nil {
+		apiBaseURL = &defaultBaseURL
 	}
 
 	c := &client{
 		userAgent:     defaultUserAgent,
 		apiKey:        apiKey,
-		baseURL:       defaultBaseURL,
+		baseURL:       *apiBaseURL,
 		httpClient:    httpClient,
 		defaultEngine: DefaultEngine,
 		idOrg:         "",
@@ -300,7 +314,9 @@ func (c *client) CompletionStreamWithEngine(
 	onData func(*CompletionResponse),
 ) error {
 	request.Stream = true
-	req, err := c.newRequest(ctx, "POST", fmt.Sprintf("/engines/%s/completions", engine), request)
+	endpointPath := "/engines/%s/completions"
+	endpointPath = "/%s/completions"
+	req, err := c.newRequest(ctx, "POST", fmt.Sprintf(endpointPath, engine), request)
 	if err != nil {
 		return err
 	}
