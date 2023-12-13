@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/PullRequestInc/go-gpt3"
-	fakes "github.com/PullRequestInc/go-gpt3/go-gpt3fakes"
+	gpt3 "github.com/chrisbward/go-gpt3orLLM"
+	fakes "github.com/chrisbward/go-gpt3orLLM/go-gpt3fakes"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 )
@@ -19,7 +19,7 @@ import (
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 net/http.RoundTripper
 
 func TestInitNewClient(t *testing.T) {
-	client := gpt3.NewClient("test-key")
+	client := gpt3.NewClient(nil, []string{"test-key"})
 	assert.NotNil(t, client)
 }
 
@@ -33,7 +33,7 @@ func fakeHttpClient() (*fakes.FakeRoundTripper, *http.Client) {
 func TestRequestCreationFails(t *testing.T) {
 	ctx := context.Background()
 	rt, httpClient := fakeHttpClient()
-	client := gpt3.NewClient("test-key", gpt3.WithHTTPClient(httpClient))
+	client := gpt3.NewClient(nil, []string{"test-key"}, gpt3.WithHTTPClient(httpClient))
 	rt.RoundTripReturns(nil, errors.New("request error"))
 
 	type testCase struct {
@@ -155,7 +155,7 @@ func (errReader) Read(p []byte) (n int, err error) {
 func TestResponses(t *testing.T) {
 	ctx := context.Background()
 	rt, httpClient := fakeHttpClient()
-	client := gpt3.NewClient("test-key", gpt3.WithHTTPClient(httpClient))
+	client := gpt3.NewClient(nil, []string{"test-key"}, gpt3.WithHTTPClient(httpClient))
 
 	type testCase struct {
 		name           string

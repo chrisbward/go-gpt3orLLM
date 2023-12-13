@@ -3,7 +3,7 @@ module github.com/chrisbward/go-gpt3orLLM
 go 1.20
 
 require (
-	github.com/PullRequestInc/go-gpt3 v1.2.0
+	github.com/chrisbward/go-gpt3orLLM v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.3
 	github.com/stretchr/testify v1.6.1

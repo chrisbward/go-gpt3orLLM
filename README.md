@@ -4,7 +4,7 @@ An OpenAI GPT-3 API client enabling Go/Golang programs to interact with the gpt3
 
 Supports using the completion APIs with or without streaming.
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/PullRequestInc/go-gpt3)](https://pkg.go.dev/github.com/PullRequestInc/go-gpt3)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/chrisbward/go-gpt3orLLM)](https://pkg.go.dev/github.com/chrisbward/go-gpt3orLLM)
 
 ## Usage
 
@@ -22,7 +22,7 @@ fmt.Print(resp.Choices[0].Text)
 
 ## Documentation
 
-Check out the go docs for more detailed documentation on the types and methods provided: https://pkg.go.dev/github.com/PullRequestInc/go-gpt3
+Check out the go docs for more detailed documentation on the types and methods provided: https://pkg.go.dev/github.com/chrisbward/go-gpt3orLLM
 
 ### Full Examples
 
@@ -45,7 +45,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/PullRequestInc/go-gpt3"
+	"github.com/chrisbward/go-gpt3orLLM"
 	"github.com/joho/godotenv"
 )
 

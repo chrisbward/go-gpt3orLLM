@@ -5,21 +5,33 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
-	"github.com/PullRequestInc/go-gpt3"
+	gpt3 "github.com/chrisbward/go-gpt3orLLM"
 	"github.com/joho/godotenv"
 )
+
+func splitString(input string) []string {
+	// Check if the input string contains a comma
+	if strings.Contains(input, ",") {
+		// Split the string if a comma is present
+		return strings.Split(input, ",")
+	} else {
+		// If no comma is present, return a slice with the original string
+		return []string{input}
+	}
+}
 
 func main() {
 	godotenv.Load()
 
-	apiKey := os.Getenv("API_KEY")
-	if apiKey == "" {
-		log.Fatalln("Missing API KEY")
+	apiKeys := splitString(os.Getenv("OPENAI_API_KEYS"))
+	if len(apiKeys) == 0 {
+		log.Fatalln("Missing OPENAI API KEYS")
 	}
 
 	ctx := context.Background()
-	client := gpt3.NewClient(apiKey)
+	client := gpt3.NewClient(nil, apiKeys)
 
 	chatResp, err := client.ChatCompletion(ctx, gpt3.ChatCompletionRequest{
 		Model: gpt3.GPT3Dot5Turbo,

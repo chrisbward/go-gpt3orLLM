@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -128,7 +129,7 @@ type Client interface {
 
 type client struct {
 	baseURL       string
-	apiKey        string
+	apiKeys       []string
 	userAgent     string
 	httpClient    *http.Client
 	defaultEngine string
@@ -136,7 +137,7 @@ type client struct {
 }
 
 // NewClient returns a new OpenAI GPT-3 API client. An apiKey is required to use the client
-func NewClient(apiBaseURL *string, apiKey string, options ...ClientOption) Client {
+func NewClient(apiBaseURL *string, apiKeys []string, options ...ClientOption) Client {
 	httpClient := &http.Client{
 		Timeout: time.Duration(defaultTimeoutSeconds * time.Second),
 	}
@@ -147,7 +148,7 @@ func NewClient(apiBaseURL *string, apiKey string, options ...ClientOption) Clien
 
 	c := &client{
 		userAgent:     defaultUserAgent,
-		apiKey:        apiKey,
+		apiKeys:       apiKeys,
 		baseURL:       *apiBaseURL,
 		httpClient:    httpClient,
 		defaultEngine: DefaultEngine,
@@ -157,6 +158,12 @@ func NewClient(apiBaseURL *string, apiKey string, options ...ClientOption) Clien
 		o(c)
 	}
 	return c
+}
+
+func (c *client) pickRandomKeyFromSlice() string {
+	rand.Seed(time.Now().UnixNano())
+	randomIndex := rand.Intn(len(c.apiKeys))
+	return c.apiKeys[randomIndex]
 }
 
 func (c *client) Engines(ctx context.Context) (*EnginesResponse, error) {
@@ -502,6 +509,6 @@ func (c *client) newRequest(ctx context.Context, method, path string, payload in
 		req.Header.Set("OpenAI-Organization", c.idOrg)
 	}
 	req.Header.Set("Content-type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.pickRandomKeyFromSlice()))
 	return req, nil
 }
